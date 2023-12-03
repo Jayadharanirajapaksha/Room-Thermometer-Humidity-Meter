@@ -1,37 +1,36 @@
-#include <DHT.h>
-#define DHTPIN 52     
+#include "DHT.h"
+#define DHTPIN 5
 #define DHTTYPE DHT11
-
-#include <LiquidCrystal.h>
-const int rs = 8, en = 9, d4 = 2, d5 = 3, d6 = 4, d7 = 5;
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-
-  dht.begin();
-  lcd.begin(16, 2);
-    lcd.print(" Make Use Of: ");          // Print a message to the LCD.
-  lcd.setCursor(0, 1);
-  lcd.print("Temp&Humidity");
+  Serial.begin(9600);
+  dht.begin(); 
 }
 
 void loop() {
-  
-  delay(1000);
-  float h = dht.readHumidity();     
-  float t = dht.readTemperature();      // Read temperature as Celsius (the default)
-  float f = dht.readTemperature(true); // Read temperature as Fahrenheit (isFahrenheit = true)
+  delay(2000); // wait a few seconds between measurements.
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Temp.: ");
-  lcd.print(t);
-  lcd.print(" C");
+ 
+  float humi  = dht.readHumidity();  // read humidity
+  float tempC = dht.readTemperature(); // read temperature as Celsius
+  float tempF = dht.readTemperature(true); // read temperature as Fahrenheit
 
-  lcd.setCursor(0, 1);
-  lcd.print("Humi.:");
-  lcd.print(h);
-  lcd.print(" %");
+  // check if any reads failed
+  if (isnan(humi) || isnan(tempC) || isnan(tempF)) {
+    Serial.println("Failed to read from DHT sensor!");
+  } else {
+    Serial.print("Humidity: ");
+    Serial.print(humi);
+    Serial.print("%");
+
+    Serial.print("  |  "); 
+
+    Serial.print("Temperature: ");
+    Serial.print(tempC);
+    Serial.print("°C ~ ");
+    Serial.print(tempF);
+    Serial.println("°F");
+  }
 }
